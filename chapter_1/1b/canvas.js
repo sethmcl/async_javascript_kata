@@ -17,7 +17,7 @@ function render() {
     speed *= -1;
   }
 
-  setTimeout(render, 0);
+  window.requestAnimationFrame(render, 0);
 }
 
 render();
