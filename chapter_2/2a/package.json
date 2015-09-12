@@ -1,0 +1,16 @@
+{
+  "name": "2a",
+  "version": "1.0.0",
+  "description": "Exercise",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha src/__tests__",
+    "debug": "./node_modules/.bin/mocha debug src/__tests__"
+  },
+  "author": "S",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "2.3.2",
+    "sinon": "1.16.1"
+  }
+}
