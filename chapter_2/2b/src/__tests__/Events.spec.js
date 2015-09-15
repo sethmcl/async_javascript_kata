@@ -12,7 +12,7 @@ describe('Events', function () {
       handlerFn = sinon.spy();
       ctx = { type: 'my object' };
 
-      instance.on('myEvent', handlerFn, ctx, 'lewis');
+      instance.on('myEvent', handlerFn, ctx, 'lewis', 'michael');
       instance.trigger('myEvent', 'seth');
       instance.trigger('myEvent', 'seth');
     });
@@ -34,8 +34,12 @@ describe('Events', function () {
     });
 
     it('should invoke callback with correct second arg', function () {
-      assert(handlerFn.args[1][1] === 'seth', 'Event handler callback arg 2 is incorrect');
+      assert(handlerFn.args[1][1] === 'michael', 'Event handler callback arg 2 is incorrect');
     });
+
+    it('should invoke callback with correct trigger arg', function () {
+      assert(handlerFn.args[1][2] === 'seth', 'Event handler trigger arg is incorrect');
+    })
   });
 
   describe('register multiple event handlers', function () {
