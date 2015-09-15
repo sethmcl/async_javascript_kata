@@ -14,7 +14,7 @@ describe('Events', function () {
 
       instance.on('myEvent', handlerFn, ctx, 'lewis', 'michael');
       instance.trigger('myEvent', 'seth');
-      instance.trigger('myEvent', 'seth');
+      instance.trigger('myEvent', 'seth', 'ariya');
     });
 
     it('should invoke callback', function () {
@@ -37,9 +37,13 @@ describe('Events', function () {
       assert(handlerFn.args[1][1] === 'michael', 'Event handler callback arg 2 is incorrect');
     });
 
-    it('should invoke callback with correct trigger arg', function () {
-      assert(handlerFn.args[1][2] === 'seth', 'Event handler trigger arg is incorrect');
-    })
+    it('should invoke callback with correct first trigger arg', function () {
+      assert(handlerFn.args[1][2] === 'seth', 'Event handler trigger arg 1 is incorrect');
+    });
+
+    it('should invoke callback with correct second trigger arg', function () {
+      assert(handlerFn.args[1][3] === 'ariya', 'Event handler trigger arg 2 is incorrect');
+    });
   });
 
   describe('register multiple event handlers', function () {
@@ -99,20 +103,28 @@ describe('Events', function () {
   });
 
   describe('remove one event handler', function () {
-    var instance, handlerFn;
+    var instance, handlerFn1, handlerFn2;
 
     before(function () {
       instance = new Events();
-      handlerFn = sinon.spy();
+      handlerFn1 = sinon.spy();
+      handlerFn2 = sinon.spy();
 
-      instance.on('myEvent', handlerFn);
+      instance.on('myEvent', handlerFn1);
+      instance.on('myEvent', handlerFn2)
       instance.trigger('myEvent');
-      instance.off('myEvent', handlerFn);
+      instance.off('myEvent', handlerFn1);
+      instance.trigger('myEvent');
+      instance.off('myEvent');
       instance.trigger('myEvent');
     });
 
-    it('should have invoked handler one time', function () {
-      assert(handlerFn.callCount === 1, 'Event handler callback was not invoked once and only once');
+    it('should have invoked first handler one time', function () {
+      assert(handlerFn1.callCount === 1, 'First event handler callback was not invoked once and only once');
+    });
+
+    it('should have invoked second handler twice', function () {
+      assert(handlerFn2.callCount === 2, 'Second event handler callback was not invoked twice and only twice');
     });
   });
 
