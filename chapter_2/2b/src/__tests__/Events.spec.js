@@ -90,15 +90,22 @@ describe('Events', function () {
 
     before(function () {
       instance = new Events();
-      handlerFn = sinon.spy();
+      handlerFn1 = sinon.spy();
+      handlerFn2 = sinon.spy();
 
-      instance.once('myEvent', handlerFn);
+      instance.once('myEvent', handlerFn1);
+      instance.once('myEvent', handlerFn2)
+      instance.on('myEvent', handlerFn2);
       instance.trigger('myEvent');
       instance.trigger('myEvent');
     });
 
     it('should have invoked handler once', function () {
-      assert(handlerFn.callCount === 1, 'Event handler callback was not invoked one and only one time');
+      assert(handlerFn1.callCount === 1, 'Event handler callback was not invoked one and only one time');
+    });
+
+    it('should not clobber an existing handler', function () {
+      assert(handlerFn2.callCount === 3, 'Existing event handler callback was clobbered by once');
     });
   });
 
