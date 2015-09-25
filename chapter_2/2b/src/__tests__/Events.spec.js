@@ -26,7 +26,7 @@ describe('Events', function () {
     });
 
     it('should invoke callback with correct number of args', function () {
-      assert(handlerFn.args.length === 2, 'Event handler callback invoked with incorrect number of args');
+      assert(handlerFn.args[0].length === 3, 'Event handler callback invoked with incorrect number of args');
     });
 
     it('should invoke callback with correct first arg', function () {
