@@ -31,13 +31,22 @@ describe('Promise library', function () {
     });
 
     it('should work with chained promises', function (done) {
+      var progress = 0;
+
       new Promise(function (resolve, reject) {
         resolve(42);
       }).then(function (val) {
+        assert.equal(val, 42);
+        progress++;
+
         return new Promise(function (resolve, reject) {
+          progress++;
+          assert.equal(progress, 2);
           resolve(val);
         });
       }).then(function (val) {
+        progress++;
+        assert.equal(progress, 3);
         assert.equal(val, 42);
         done();
       });

@@ -68,32 +68,6 @@ Promise.all = function (promises) {
 };
 
 
-// Define Promise properties
-Object.defineProperties(Promise.prototype, {
-  isResolved: {
-    get: function () {
-      return this.state === this.RESOLVED;
-    }
-  },
-  isRejected: {
-    get: function () {
-      return this.state === this.REJECTED;
-    }
-  },
-  isPending: {
-    get: function () {
-      return this.state === this.PENDING;
-    }
-  },
-  promise: {
-    get: function () {
-      return {
-        then: this.then.bind(this)
-      }
-    }
-  }
-});
-
 /**
  * Promises/A+ compatible then() method
  * @param {Function} onResolved - function to call when promise is resolveed
@@ -111,18 +85,18 @@ Promise.prototype.then = function (onResolved, onRejected) {
 
   var then = { onResolved: onResolved, onRejected: onRejected, p: p, resolveP: resolveSelf, rejectP: rejectSelf };
 
-  if (this.isResolved) {
+  if (this.state === this.RESOLVED) {
     setTimeout(function () {
       doResolve.call(this, then);
     }.bind(this), 0);
-  } else if (this.isRejected) {
+  } else if (this.state === this.REJECTED) {
     setTimeout(function () {
       doReject.call(this, then);
     }.bind(this), 0);
   }
 
   this.thens.push(then);
-  return p.promise;
+  return p;
 };
 
 /**
@@ -132,7 +106,7 @@ Promise.prototype.then = function (onResolved, onRejected) {
 function resolve(value) {
   this.value = value;
 
-  if (!this.isPending) {
+  if (this.state !== this.PENDING) {
     return;
   }
 
@@ -150,7 +124,7 @@ function resolve(value) {
 function reject(reason) {
   this.reason = reason;
 
-  if (!this.isPending) {
+  if (this.state !== this.PENDING) {
     return;
   }
 
