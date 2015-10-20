@@ -17,58 +17,6 @@ function Promise(runFn) {
 }
 
 /**
- * Return a new promise that is in the resolved state
- * @returns {Promise}
- */
-Promise.resolve = function (value) {
-  return new Promise(function (resolve, reject) {
-    resolve(value);
-  });
-};
-
-/**
- * Return a new promise that is in the rejected state
- * @returns {Promise}
- */
-Promise.reject = function (reason) {
-  return new Promise(function (resolve, reject) {
-    reject(reason);
-  });
-};
-
-/**
- * Helper: wait for all promises to be resolveed
- * @param {Array} promises Array of promisies to await
- */
-Promise.all = function (promises) {
-  var resolveCount  = 0;
-  var resolveValues = [];
-  var resolveB;
-  var rejectB;
-
-  var b = new Promise(function (resolve, reject) {
-    resolveB = resolve;
-    rejectB = reject;
-  });
-
-  promises.forEach(function (p, idx) {
-    p.then(function (value) {
-      resolveCount++;
-      resolveValues[idx] = value;
-
-      if (resolveCount === promises.length) {
-        resolveB(resolveValues);
-      }
-    }, function (error) {
-      rejectB(error);
-    });
-  });
-
-  return b;
-};
-
-
-/**
  * Promises/A+ compatible then() method
  * @param {Function} onResolved - function to call when promise is resolveed
  * @param {Function} onRejected - function to call when promise is rejected
@@ -196,3 +144,57 @@ function doReject(then) {
     then.rejectP(e);
   }
 }
+
+
+// Helper methods
+
+/**
+ * Return a new promise that is in the resolved state
+ * @returns {Promise}
+ */
+Promise.resolve = function (value) {
+  return new Promise(function (resolve, reject) {
+    resolve(value);
+  });
+};
+
+/**
+ * Return a new promise that is in the rejected state
+ * @returns {Promise}
+ */
+Promise.reject = function (reason) {
+  return new Promise(function (resolve, reject) {
+    reject(reason);
+  });
+};
+
+/**
+ * Helper: wait for all promises to be resolveed
+ * @param {Array} promises Array of promisies to await
+ */
+Promise.all = function (promises) {
+  var resolveCount  = 0;
+  var resolveValues = [];
+  var resolveB;
+  var rejectB;
+
+  var b = new Promise(function (resolve, reject) {
+    resolveB = resolve;
+    rejectB = reject;
+  });
+
+  promises.forEach(function (p, idx) {
+    p.then(function (value) {
+      resolveCount++;
+      resolveValues[idx] = value;
+
+      if (resolveCount === promises.length) {
+        resolveB(resolveValues);
+      }
+    }, function (error) {
+      rejectB(error);
+    });
+  });
+
+  return b;
+};

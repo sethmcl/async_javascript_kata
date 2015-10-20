@@ -5,14 +5,12 @@ var Promise = require('../Promise.js');
 describe('Promise library', function () {
   describe('resolve', function () {
     it('should invoke the resolve callback', function (done) {
-      var callbackResolve = function (value) {
-        assert.equal(value, 42);
-        done();
-      };
-
       new Promise(function (resolve, reject) {
         resolve(42);
-      }).then(callbackResolve, null);
+      }).then(function (value) {
+        assert.equal(value, 42);
+        done();
+      }, null);
 
     });
   });
