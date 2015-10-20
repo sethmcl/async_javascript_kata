@@ -12,9 +12,29 @@ function Promise(runFn) {
   this.state = this.PENDING;
 
   if (runFn) {
-    runFn(this.resolve.bind(this), this.reject.bind(this));
+    runFn(resolve.bind(this), reject.bind(this));
   }
 }
+
+/**
+ * Return a new promise that is in the resolved state
+ * @returns {Promise}
+ */
+Promise.resolve = function (value) {
+  return new Promise(function (resolve, reject) {
+    resolve(value);
+  });
+};
+
+/**
+ * Return a new promise that is in the rejected state
+ * @returns {Promise}
+ */
+Promise.reject = function (reason) {
+  return new Promise(function (resolve, reject) {
+    reject(reason);
+  });
+};
 
 /**
  * Helper: wait for all promises to be resolveed
@@ -23,7 +43,13 @@ function Promise(runFn) {
 Promise.all = function (promises) {
   var resolveCount  = 0;
   var resolveValues = [];
-  var b             = new Promise();
+  var resolveB;
+  var rejectB;
+
+  var b = new Promise(function (resolve, reject) {
+    resolveB = resolve;
+    rejectB = reject;
+  });
 
   promises.forEach(function (p, idx) {
     p.then(function (value) {
@@ -31,10 +57,10 @@ Promise.all = function (promises) {
       resolveValues[idx] = value;
 
       if (resolveCount === promises.length) {
-        b.resolve(resolveValues);
+        resolveB(resolveValues);
       }
     }, function (error) {
-      b.reject(error);
+      rejectB(error);
     });
   });
 
@@ -75,8 +101,15 @@ Object.defineProperties(Promise.prototype, {
  * @returns {Object} a new promise
  */
 Promise.prototype.then = function (onResolved, onRejected) {
-  var p = new Promise();
-  var then = { onResolved: onResolved, onRejected: onRejected, p: p };
+  var resolveSelf;
+  var rejectSelf;
+
+  var p = new Promise(function (resolve, reject) {
+    resolveSelf = resolve;
+    rejectSelf = reject;
+  });
+
+  var then = { onResolved: onResolved, onRejected: onRejected, p: p, resolveP: resolveSelf, rejectP: rejectSelf };
 
   if (this.isResolved) {
     setTimeout(function () {
@@ -96,7 +129,7 @@ Promise.prototype.then = function (onResolved, onRejected) {
  * Resolve this promise
  * @param {Object} value the value to resolve with
  */
-Promise.prototype.resolve = function (value) {
+function resolve(value) {
   this.value = value;
 
   if (!this.isPending) {
@@ -114,7 +147,7 @@ Promise.prototype.resolve = function (value) {
  * Reject this promise
  * @param {Object} reason the reason for rejection
  */
-Promise.prototype.reject = function (reason) {
+function reject(reason) {
   this.reason = reason;
 
   if (!this.isPending) {
@@ -142,20 +175,20 @@ function doResolve(then) {
     if (typeof onResolved === 'function') {
       retVal = onResolved(this.value);
     } else {
-      p.resolve(this.value);
+      then.resolveP(this.value);
     }
 
     if (retVal && typeof retVal.then === 'function') {
       retVal.then(function (value) {
-        p.resolve(value);
+        then.resolveP(value);
       }, function (reason) {
-        p.reject(reason);
+        then.rejectP(reason);
       });
     } else {
-      p.resolve(retVal);
+      then.resolveP(retVal);
     }
   } catch (e) {
-    p.reject(e);
+    then.rejectP(e);
   }
 }
 
@@ -173,19 +206,19 @@ function doReject(then) {
     if (typeof onRejected === 'function') {
       retVal = onRejected(this.reason);
     } else {
-      p.reject(this.reason);
+      then.rejectP(this.reason);
     }
 
     if (retVal && typeof retVal.then === 'function') {
       retVal.then(function (value) {
-        p.resolve(value);
+        then.resolveP(value);
       }, function (reason) {
-        p.reject(reason);
+        then.rejectP(reason);
       });
     } else {
-      p.resolve(retVal);
+      then.resolveP(retVal);
     }
   } catch(e) {
-    p.reject(e);
+    then.rejectP(e);
   }
 }

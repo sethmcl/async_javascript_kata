@@ -29,10 +29,39 @@ describe('Promise library', function () {
       }).then(null, callbackReject);
 
     });
+
+    it('should work with chained promises', function (done) {
+      new Promise(function (resolve, reject) {
+        resolve(42);
+      }).then(function (val) {
+        return new Promise(function (resolve, reject) {
+          resolve(val);
+        });
+      }).then(function (val) {
+        assert.equal(val, 42);
+        done();
+      });
+    });
   });
 
-  describe('all', function () {
-    it('should invoke the resolve callback', function (done) {
+  describe('helper methods', function () {
+    it('Promise.reject() should return a rejected promise', function (done) {
+      var p = Promise.reject(new Error('An error'));
+      p.then(null, function (err) {
+        assert.equal(err.message, 'An error');
+        done();
+      });
+    });
+
+    it('Promise.resolve() should return a resolved promise', function (done) {
+      var p = Promise.resolve(42);
+      p.then(function (value) {
+        assert.equal(value, 42);
+        done();
+      }, null);
+    });
+
+    it('Promise.all() should wait for all promises to complete', function (done) {
       var promise1 = new Promise(function (resolve, reject) {
         setTimeout(resolve, 100, 1);
       });
