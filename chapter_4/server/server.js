@@ -45,7 +45,7 @@ function randomDelay(fn) {
 
 
 app.use('/poem/row/:part', function (req, res) {
-  var verse = verses[req.params.part];
+  var verse = rowShort[req.params.part];
 
   if (!verse) {
     randomDelay(res.end.bind(res, 'ERROR: parameter out of range'));
