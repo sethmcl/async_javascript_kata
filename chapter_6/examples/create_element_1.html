@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>page 1</title>
+    <style>
+      body {
+        background-color: yellow;
+      }
+    </style>
+    <script>
+      function loadScript(url) {
+        var s = document.createElement('script');
+        s.src = url;
+        document.head.appendChild(s);
+      }
+      loadScript('jquery.js');
+      loadScript('app.js');
+    </script>
+  </head>
+  <body>
+    <h1>document.createElement</h1>
+    <h2>Page 1</h2>
+    <a href="create_element_2.html">view page 2</a>
+    <h2>Hello world!</h2>
+  </body>
+</html>
